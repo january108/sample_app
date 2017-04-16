@@ -3,6 +3,10 @@ Rails.application.routes.draw do
   get 'static_pages/help'
   get 'static_pages/about'
   get 'static_pages/contact'
+  
+  get '/home', to: redirect('/static_pages/home')
+  get '/help', to: redirect('/static_pages/help')
+  get '/about', to: redirect('/static_pages/about')
 
   root 'static_pages#home'
 end
