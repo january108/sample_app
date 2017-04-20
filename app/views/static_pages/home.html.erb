@@ -3,7 +3,9 @@
     
     <h2>
         This is a Home Page for the
-        <a href="http://railstutorial.jp">Ruby on Rails Tutorial</a> sample application 
+        <!--
+        <a href="http://railstutorial.jp">Ruby on Rails Tutorial</a> sample application -->
+        <%= link_to "Ruby on Rails Tutorial", "http://railstutorial.jp", target: "_blank" %> sample application 
     </h2>
     
     <%= link_to "Sign up now!", signup_path, class:"btn btn-lg btn-primary" %> &nbsp;
