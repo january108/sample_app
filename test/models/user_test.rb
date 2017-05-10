@@ -85,4 +85,9 @@ class UserTest < ActiveSupport::TestCase
   test "digest should be created" do
     assert_not_empty User.digest(User.new_token)
   end
+  
+  test "authenticated? should return false for a user with nil digest" do 
+    assert_not @user.authenticated?('')
+  end
+  
 end
