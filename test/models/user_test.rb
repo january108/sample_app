@@ -1,9 +1,7 @@
 require 'test_helper'
 
 class UserTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+
   def setup 
     @user = User.new(name:"example user", email:"user@example.com", 
                     password:"foobar", password_confirmation:"foobar")
@@ -51,14 +49,14 @@ class UserTest < ActiveSupport::TestCase
     end
   end
   
-  test "email shoud be unique" do
+  test "email should be unique" do
     duplicate_user = @user.dup
     duplicate_user.email = @user.email.upcase
     @user.save
     assert_not duplicate_user.valid?
   end
   
-  test "email shoud be saved as lower-case" do
+  test "email should be saved as lower-case" do
     mixed_cased_email = "Foo@ExAmPle.Com"
     @user.email = mixed_cased_email
     @user.save
@@ -74,5 +72,17 @@ class UserTest < ActiveSupport::TestCase
     @user.password = @user.password_confirmation = "a" * 5
     assert_not @user.valid?
   end
+  
+  test "password digest should be saved" do
+    @user.remember
+    assert_not_empty @user.remember_digest
+  end
+  
+  test "new_token should be created" do
+    assert_not_empty User.new_token
+  end
 
+  test "digest should be created" do
+    assert_not_empty User.digest(User.new_token)
+  end
 end
