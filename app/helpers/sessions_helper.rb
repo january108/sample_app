@@ -26,8 +26,13 @@ module SessionsHelper
         end
     end
     
-    # ユーザがログインしていればtrue、その他ならfalseを返す
+    # typo
     def loged_in?
+        logged_in?
+    end
+    
+    # ユーザがログインしていればtrue、その他ならfalseを返す
+    def logged_in?
         !current_user.nil?
     end
     
