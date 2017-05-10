@@ -8,7 +8,7 @@ class SessionsController < ApplicationController
       # ログインが成功したら Cookie に記憶し、ユーザ情報のページへ
       log_in user
       params[:session][:remember_me] == '1' ? remember(user) : forget(user)
-      redirect_to user
+      redirect_back_or user
     else
       # ログイン失敗のエラーメッセージを表示
       flash.now[:danger] = "Invalid email/password combination"

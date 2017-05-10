@@ -7,6 +7,9 @@ class UsersEditTest < ActionDispatch::IntegrationTest
     @other_user = users(:archer)
   end
   
+  #
+  # authentication
+  #
   test "unsuccessful edit" do
     log_in_as(@user)
     
@@ -48,6 +51,9 @@ class UsersEditTest < ActionDispatch::IntegrationTest
     assert_equal email, @user.email
   end
 
+  #
+  # authorization
+  #
   test "should redirect edit when logged in as wrong user" do
     log_in_as(@other_user)
     get edit_user_path(@user)
@@ -65,6 +71,32 @@ class UsersEditTest < ActionDispatch::IntegrationTest
                                     }
     assert flash.empty?
     assert_redirected_to root_url
+  end
+  
+  #
+  # friendly forwarding
+  #
+  test "successful edit with friendly forwarding" do
+    get edit_user_path(@user)
+    log_in_as(@user)
+    assert_redirected_to edit_user_url(@user)
+    
+    name = "Foo Bar"
+    email = "foo@bar.com"
+    patch user_path(@user), params:{
+                                      user:{
+                                        name: name,
+                                        email: email,
+                                        password: "",
+                                        password_confirmation: ""
+                                      }
+                                    }
+    assert_not flash.empty?
+    assert_redirected_to @user
+    
+    @user.reload
+    assert_equal name, @user.name
+    assert_equal email, @user.email
   end
 
 end
