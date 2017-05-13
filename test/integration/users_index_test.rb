@@ -10,10 +10,15 @@ class UsersIndexTest < ActionDispatch::IntegrationTest
     assert_redirected_to login_url
   end
   
-  test "show users page with logged in" do
+  test "index including pagination" do
     log_in_as @user
     get users_url
+    
     assert_template 'users/index'
+    assert_select 'div.pagination', count:2
+    User.paginate(page: 1).each do |user|
+      assert_select 'a[href=?]',user_path(user), test:user.name
+    end
   end
   
 end
