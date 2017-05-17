@@ -1,2 +1,0 @@
-class MicropstsController < ApplicationController
-end
