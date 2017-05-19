@@ -31,12 +31,13 @@ class User < ApplicationRecord
     # 永続セッションのためにユーザを永続化する
     def remember
         self.remember_token = User.new_token
-        update_attribute(:remember_digest, remember_token)
+        update_attribute(:remember_digest, User.digest(remember_token))
     end
 
     # 渡されたトークンがダイジェストと一致したら true を返す
     def authenticated?(remember_token)
         return false if remember_digest.nil?
+        # valid hash => h =~ /^\$[0-9a-z]{2}\$[0-9]{2}\$[A-Za-z0-9\.\/]{53}$/
         BCrypt::Password.new(remember_digest).is_password?(remember_token)
     end
     
