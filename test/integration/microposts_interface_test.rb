@@ -26,7 +26,7 @@ class MicropostsInterfaceTest < ActionDispatch::IntegrationTest
       post microposts_path, params: { micropost: { content: content, picture: picture} }
     end
     assert assigns(:micropost).picture? # postした micropost の picure が有効か？
-    assert_redirected_to root_url
+    assert_redirected_to root_url # post 前には root_url にいた
     follow_redirect!
     assert_match content, response.body
     

@@ -47,7 +47,9 @@ class User < ApplicationRecord
     end
     
     # ユーザのfeed
+    # あとで他の人のフィードも混ぜたいという目論見あり
     def feed
-        Micropost.where("user_id = ?", id)
+        # SQL injection対応してくれる
+        Micropost.where("user_id = ?", self.id)
     end
 end
