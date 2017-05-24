@@ -36,7 +36,7 @@ class UserTest < ActiveSupport::TestCase
                          first.last@foo.jp alice+bob@baz.cn]
     valid_addresses.each do |valid_address|
       @user.email = valid_address
-      assert @user.valid?, "#{valid_address.inspect} shoud be valid"
+      assert @user.valid?, "#{valid_address.inspect} should be valid"
     end
   end
   
@@ -97,4 +97,20 @@ class UserTest < ActiveSupport::TestCase
       @user.destroy
     end
   end
+  
+  test "should follow and unfollow a user" do
+    michael = users(:michael)
+    archer = users(:archer)
+    assert_not michael.following?(archer)
+    assert_not archer.followed?(michael)
+    
+    michael.follow(archer)
+    assert michael.following?(archer)
+    assert archer.followed?(michael)
+    
+    michael.unfollow(archer)
+    assert_not michael.following?(archer)
+    assert_not archer.followed?(michael)
+  end
+  
 end

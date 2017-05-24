@@ -1,11 +1,29 @@
 class User < ApplicationRecord
+    #
+    # relation
+    #
+
+    # micropost
     has_many :microposts, dependent: :destroy
+    
+    # following / followed user 
     has_many :active_relationships, 
                class_name: "Relationship",
                foreign_key: "follower_id",
                dependent:   :destroy
+    has_many :passive_relationships, 
+               class_name: "Relationship",
+               foreign_key: "followed_id",
+               dependent:   :destroy
+    has_many :following, through: :active_relationships, source: :followed
+    has_many :followers, through: :passive_relationships, source: :follower
+    
+
     attr_accessor :remember_token
     
+    #
+    # validation
+    #
     before_save {self.email = email.downcase}
     validates :name, presence: true, length: { maximum: 50 }
     
@@ -18,6 +36,11 @@ class User < ApplicationRecord
     
     has_secure_password
     
+    
+    #
+    # method 
+    #
+
     # クラスメソッド
     class << self
         # 渡された文字列のハッシュ値を返す
@@ -56,4 +79,25 @@ class User < ApplicationRecord
         # SQL injection対応してくれる
         Micropost.where("user_id = ?", self.id)
     end
+    
+    # ユーザをフォローする
+    def follow(other_user)
+        active_relationships.create(followed_id: other_user.id)
+    end
+    
+    # ユーザをフォロー解除する
+    def unfollow(other_user)
+        active_relationships.find_by(followed_id: other_user.id).destroy
+    end
+    
+    # 現在のユーザがフォローしていたら true を返す
+    def following?(other_user)
+        following.include?(other_user)
+    end
+    
+    # 現在のユーザがフォローされていたら true を返す
+    def followed?(user)
+        followers.include?(user)
+    end
+    
 end
