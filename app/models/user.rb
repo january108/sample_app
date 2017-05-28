@@ -15,6 +15,10 @@ class User < ApplicationRecord
                class_name: "Relationship",
                foreign_key: "followed_id",
                dependent:   :destroy
+    # フォローしているユーザの集合を簡単に取得するためのショートカット
+    # このショートカットは active_relationships.map(&:followed) と同じ結果となるが、
+    # mapナントカという書き方は、メソッドチェーンをたどる過程でそれぞれクエリが吐かれ、性能が悪い
+    # (1) このUser の (2) relationshipを取得し、(3) さらにuserを取得する
     has_many :following, through: :active_relationships, source: :followed
     has_many :followers, through: :passive_relationships, source: :follower
     
@@ -83,6 +87,7 @@ class User < ApplicationRecord
     # ユーザをフォローする
     def follow(other_user)
         active_relationships.create(followed_id: other_user.id)
+        # p "follow #{self.name} => #{other_user.name}"
     end
     
     # ユーザをフォロー解除する
