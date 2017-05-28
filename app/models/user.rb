@@ -78,10 +78,12 @@ class User < ApplicationRecord
     end
     
     # ユーザのfeed
-    # あとで他の人のフィードも混ぜたいという目論見あり
     def feed
         # SQL injection対応してくれる
-        Micropost.where("user_id = ?", self.id)
+        # Micropost.where("user_id IN (?) or user_id = ?", following_ids, id)
+        # Micropost.where("user_id IN (:following_ids) or user_id = :user_id", following_ids: following_ids, user_id: id)
+        following_ids = "SELECT followed_id FROM relationships WHERE follower_id = :user_id"
+        Micropost.where("user_id IN (#{following_ids}) OR user_id = :user_id", user_id: id)
     end
     
     # ユーザをフォローする
