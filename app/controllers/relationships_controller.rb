@@ -7,6 +7,7 @@ class RelationshipsController < ApplicationController
         # format.html または format.js のいずれか一方が実行される
         respond_to do |format|
             format.html { redirect_to @user }
+            # app/views/relationships/create.js.erb
             format.js
         end
     end
@@ -16,6 +17,7 @@ class RelationshipsController < ApplicationController
         current_user.unfollow(@user)
         respond_to do |format|
             format.html { redirect_to @user }
+            # app/views/relationships/destroy.js.erb
             format.js
         end
     end
