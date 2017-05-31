@@ -15,7 +15,7 @@ class FollowingTest < ActionDispatch::IntegrationTest
     @user.following.each do |user|
       assert_select "a[href=?]", user_path(user)
     end
-    assert_match "following", response.body
+    assert_select 'h3', :text=>'Following'
   end
 
   test "followers page" do
@@ -25,19 +25,28 @@ class FollowingTest < ActionDispatch::IntegrationTest
     @user.followers.each do |user|
       assert_select "a[href=?]", user_path(user)
     end
-    assert_match "followers", response.body
+    assert_select 'h3', :text=>'Followers'
   end
   
   test "should follow a user the standard way" do
     assert_difference '@user.following.count', 1 do
       post relationships_path, params: { followed_id: @other.id }
     end
+    
+    assert redirect?
+    follow_redirect!
+    assert_select 'a>strong#followers', :text=>@other.followers.count.to_s
   end
 
   test "should follow a user with Ajax" do
     assert_difference '@user.following.count', 1 do
       post relationships_path, xhr: true, params: { followed_id: @other.id }
     end
+    
+    assert_not redirect? # response=200
+    # p response.body
+    assert_match '#followers', response.body
+    assert_match @other.followers.count.to_s, response.body
   end
 
   test "should unfollow a user the standard way" do
@@ -46,6 +55,10 @@ class FollowingTest < ActionDispatch::IntegrationTest
     assert_difference '@user.following.count', -1 do
       delete relationship_path(relationship)
     end
+
+    assert redirect?
+    follow_redirect!
+    assert_select 'a>strong#followers', :text=>@other.followers.count.to_s
   end
 
   test "should unfollow a user with Ajax" do
@@ -54,6 +67,11 @@ class FollowingTest < ActionDispatch::IntegrationTest
     assert_difference '@user.following.count', -1 do
       delete relationship_path(relationship), xhr: true
     end
+    
+    assert_not redirect? # response=200
+    # p response.body
+    assert_match '#followers', response.body
+    assert_match @other.followers.count.to_s, response.body
   end
   
   test "feed on Home Page" do
