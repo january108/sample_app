@@ -1,8 +1,19 @@
 class User < ApplicationRecord
     #
+    # attribute accessor
+    #
+    attr_accessor :remember_token, :activation_token
+    
+    #
+    # Call Back
+    #
+    before_save :downcase_email
+    before_create :create_activation_digest
+
+    #
     # relation
     #
-
+    
     # micropost
     has_many :microposts, dependent: :destroy
     
@@ -23,12 +34,9 @@ class User < ApplicationRecord
     has_many :followers, through: :passive_relationships, source: :follower
     
 
-    attr_accessor :remember_token
-    
     #
     # validation
     #
-    before_save {self.email = email.downcase}
     validates :name, presence: true, length: { maximum: 50 }
     
     VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
@@ -106,5 +114,18 @@ class User < ApplicationRecord
     def followed?(user)
         followers.include?(user)
     end
+    
+    private
+        # email を全て小文字にします
+        def downcase_email
+            email.downcase!
+        end
+        
+        # 有効化トークンとダイジェストを作成し、自身に設定する
+        def create_activation_digest
+            self.activation_token = User.new_token
+            self.activation_digest = User.digest(activation_token)
+        end
+
     
 end
