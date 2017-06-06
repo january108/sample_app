@@ -74,10 +74,11 @@ class User < ApplicationRecord
     end
 
     # 渡されたトークンがダイジェストと一致したら true を返す
-    def authenticated?(remember_token)
-        return false if remember_digest.nil?
+    def authenticated?(attribute, token)
+        digest = send("#{attribute}_digest")
+        return false if digest.nil?
         # valid hash => h =~ /^\$[0-9a-z]{2}\$[0-9]{2}\$[A-Za-z0-9\.\/]{53}$/
-        BCrypt::Password.new(remember_digest).is_password?(remember_token)
+        BCrypt::Password.new(digest).is_password?(token)
     end
     
     # ユーザのログアウト情報を破棄する
@@ -113,6 +114,18 @@ class User < ApplicationRecord
     # 現在のユーザがフォローされていたら true を返す
     def followed?(user)
         followers.include?(user)
+    end
+    
+    # アカウントを有効にする
+    def activate
+        # update_attribute(:activated, true)
+        # update_attribute(:activated_at, Time.zone.now)
+        update_columns(activated: true, activated_at: Time.zone.now)
+    end
+    
+    # 有効化用のメールを送信する
+    def send_activation_email
+      UserMailer.account_activation(self).deliver_now
     end
     
     private
