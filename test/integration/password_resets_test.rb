@@ -42,6 +42,12 @@ class PasswordResetsTest < ActionDispatch::IntegrationTest
     get edit_password_reset_path("wrong token", email: user.email)
     assert_redirected_to root_url
     
+    # トークンが有効期限切れ
+    user.update_attribute(:reset_sent_at, 3.hours.ago)
+    get edit_password_reset_path(user.reset_token, email: user.email)
+    assert_redirected_to new_password_reset_url
+    user.update_attribute(:reset_sent_at, Time.zone.now)
+    
     # メールアドレスもトークンも有効
     get edit_password_reset_path(user.reset_token, email: user.email)
     assert_template 'password_resets/edit'
